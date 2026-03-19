@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useRef } from "react";
 import {
   ChevronDown,
   ChevronRight,
@@ -50,6 +50,7 @@ export function CategorySection({
   const [showDone, setShowDone] = useState(false);
   const [newTaskTitle, setNewTaskTitle] = useState("");
   const [showAddTask, setShowAddTask] = useState(false);
+  const headerRef = useRef<HTMLDivElement>(null);
 
   const {
     attributes,
@@ -117,7 +118,16 @@ export function CategorySection({
           <GripVertical className="w-4 h-4" />
         </button>
         <button
-          onClick={() => setIsOpen(!isOpen)}
+          onClick={() => {
+            if (!isOpen) {
+              // Remember scroll position to prevent jump
+              const scrollY = window.scrollY;
+              setIsOpen(true);
+              requestAnimationFrame(() => window.scrollTo(0, scrollY));
+            } else {
+              setIsOpen(false);
+            }
+          }}
           className="flex items-center gap-2 flex-1 min-w-0"
         >
           {isOpen ? (
