@@ -139,11 +139,10 @@ export function WbsApp() {
   }
 
   return (
-    <div className="min-h-screen bg-stone-100">
+    <div className="min-h-screen bg-stone-200">
       {/* Header */}
-      <header className="sticky top-0 z-10 bg-stone-100 pt-[max(3.5rem,calc(env(safe-area-inset-top)+1rem))] pb-4 px-5 mb-2">
+      <header className="sticky top-0 z-10 bg-stone-200 pt-[max(3.5rem,calc(env(safe-area-inset-top)+1rem))] pb-4 px-5 mb-2">
         <div className="max-w-lg mx-auto">
-          <p className="text-xs text-stone-400 mb-1">{today}</p>
           <div className="flex items-center justify-between">
             <h1 className="font-bold text-xl tracking-tight">読書事業WBS</h1>
             <button
@@ -157,11 +156,14 @@ export function WbsApp() {
               追加
             </button>
           </div>
-          {allTasks.length > 0 && (
-            <p className="text-xs text-stone-400 mt-1">
-              {doneTotal}/{allTasks.length} 完了
-            </p>
-          )}
+          <div className="flex items-center gap-3 mt-2">
+            <p className="text-sm font-medium text-stone-700">{today}</p>
+            {allTasks.length > 0 && (
+              <span className="text-xs text-stone-500">
+                {doneTotal}/{allTasks.length} 完了
+              </span>
+            )}
+          </div>
         </div>
       </header>
 
@@ -169,7 +171,7 @@ export function WbsApp() {
       <div className="max-w-lg mx-auto px-4 pb-[max(6rem,calc(1.5rem+env(safe-area-inset-bottom)))]">
         <div className="space-y-3">
           {categories.length === 0 ? (
-            <div className="text-center py-16 text-stone-400">
+            <div className="text-center py-16 text-stone-500">
               <BookOpen className="w-10 h-10 mx-auto mb-3 opacity-40" />
               <p className="text-sm">カテゴリを追加して始めましょう</p>
             </div>

@@ -105,7 +105,7 @@ export function CategorySection({
     <div
       ref={setNodeRef}
       style={style}
-      className={`bg-stone-50 rounded-xl ${allDone ? "opacity-50" : ""}`}
+      className={`bg-stone-100 rounded-xl ${allDone ? "opacity-50" : ""}`}
     >
       {/* Category Header */}
       <div className="flex items-center gap-1 px-2 py-3">
@@ -121,17 +121,17 @@ export function CategorySection({
           className="flex items-center gap-2 flex-1 min-w-0"
         >
           {isOpen ? (
-            <ChevronDown className="w-4 h-4 text-stone-400 shrink-0" />
+            <ChevronDown className="w-4 h-4 text-stone-500 shrink-0" />
           ) : (
-            <ChevronRight className="w-4 h-4 text-stone-400 shrink-0" />
+            <ChevronRight className="w-4 h-4 text-stone-500 shrink-0" />
           )}
           <span
-            className={`font-semibold text-sm truncate ${allDone ? "line-through text-stone-400" : "text-stone-800"}`}
+            className={`font-semibold text-sm truncate ${allDone ? "line-through text-stone-500" : "text-stone-800"}`}
           >
             {category.name}
           </span>
         </button>
-        <span className="text-xs text-stone-400 shrink-0 tabular-nums">
+        <span className="text-xs text-stone-500 shrink-0 tabular-nums">
           {allDone ? "完了" : `${doneCount}/${totalCount}`}
         </span>
         <DropdownMenu>
@@ -140,7 +140,7 @@ export function CategorySection({
               <Button
                 variant="ghost"
                 size="icon"
-                className="shrink-0 h-7 w-7 text-stone-400"
+                className="shrink-0 h-7 w-7 text-stone-500"
               />
             }
           >
@@ -182,10 +182,10 @@ export function CategorySection({
         return (
           <div className="px-4 pb-2.5 flex items-center gap-2">
             <Calendar className={`w-3 h-3 shrink-0 ${
-              dueStatus === "overdue" ? "text-red-500" : dueStatus === "soon" ? "text-amber-500" : "text-stone-400"
+              dueStatus === "overdue" ? "text-red-500" : dueStatus === "soon" ? "text-amber-500" : "text-stone-500"
             }`} />
             <span className={`text-[11px] truncate ${
-              dueStatus === "overdue" ? "text-red-500 font-medium" : dueStatus === "soon" ? "text-amber-500 font-medium" : "text-stone-400"
+              dueStatus === "overdue" ? "text-red-500 font-medium" : dueStatus === "soon" ? "text-amber-500 font-medium" : "text-stone-500"
             }`}>
               {formatDueDate(upcoming.dueDate)} {upcoming.title}
               {dueStatus === "overdue" && " - 期限切れ"}
@@ -231,7 +231,7 @@ export function CategorySection({
                             ? "text-red-500 font-medium"
                             : dueStatus === "soon"
                               ? "text-amber-500 font-medium"
-                              : "text-stone-400"
+                              : "text-stone-500"
                         }`}
                       >
                         {dueStatus === "overdue" ? (
@@ -245,7 +245,7 @@ export function CategorySection({
                       </span>
                     )}
                     {task.link && (
-                      <ExternalLink className="w-3 h-3 text-stone-400" />
+                      <ExternalLink className="w-3 h-3 text-stone-500" />
                     )}
                   </div>
                 </button>
@@ -258,7 +258,7 @@ export function CategorySection({
             <div className="mx-1">
               <button
                 onClick={() => setShowDone(!showDone)}
-                className="flex items-center gap-1.5 px-4 py-2 text-[11px] text-stone-400 hover:text-stone-600 w-full"
+                className="flex items-center gap-1.5 px-4 py-2 text-[11px] text-stone-500 hover:text-stone-600 w-full"
               >
                 {showDone ? (
                   <ChevronDown className="w-3 h-3" />
@@ -278,7 +278,7 @@ export function CategorySection({
                       onClick={() => onToggleStatus(task)}
                     />
                     <button
-                      className="flex-1 text-left text-xs min-w-0 line-through text-stone-400"
+                      className="flex-1 text-left text-xs min-w-0 line-through text-stone-500"
                       onClick={() => onEditTask(task)}
                     >
                       <span className="block truncate">{task.title}</span>
@@ -312,7 +312,7 @@ export function CategorySection({
           ) : (
             <button
               onClick={() => setShowAddTask(true)}
-              className="flex items-center gap-2 px-4 py-2.5 text-sm text-stone-400 hover:text-stone-600 w-full"
+              className="flex items-center gap-2 px-4 py-2.5 text-sm text-stone-500 hover:text-stone-600 w-full"
             >
               <Plus className="w-4 h-4" />
               タスクを追加
