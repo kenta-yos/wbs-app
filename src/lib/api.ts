@@ -63,3 +63,11 @@ export async function updateTask(
 export async function deleteTask(id: number): Promise<void> {
   await fetch(`${BASE}/tasks?id=${id}`, { method: "DELETE" });
 }
+
+export async function reorderCategories(ids: number[]): Promise<void> {
+  await fetch(`${BASE}/categories/reorder`, {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({ ids }),
+  });
+}

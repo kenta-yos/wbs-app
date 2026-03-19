@@ -10,7 +10,22 @@ import {
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { Button } from "@/components/ui/button";
-import { Task } from "@/lib/types";
+import { Task, TaskStatus, STATUS_LABELS } from "@/lib/types";
+
+const statusStyles: Record<TaskStatus, { active: string; inactive: string }> = {
+  todo: {
+    active: "bg-gray-200 text-gray-800 border-gray-400",
+    inactive: "bg-gray-50 text-gray-400 border-gray-200",
+  },
+  in_progress: {
+    active: "bg-blue-100 text-blue-800 border-blue-400",
+    inactive: "bg-blue-50 text-blue-300 border-blue-200",
+  },
+  done: {
+    active: "bg-green-100 text-green-800 border-green-400",
+    inactive: "bg-green-50 text-green-300 border-green-200",
+  },
+};
 
 interface TaskEditDialogProps {
   task: Task | null;
@@ -18,6 +33,7 @@ interface TaskEditDialogProps {
   onClose: () => void;
   onSave: (data: {
     title: string;
+    status: TaskStatus;
     memo: string | null;
     link: string | null;
     dueDate: string | null;
@@ -33,6 +49,7 @@ export function TaskEditDialog({
   onDelete,
 }: TaskEditDialogProps) {
   const [title, setTitle] = useState(task?.title ?? "");
+  const [status, setStatus] = useState<TaskStatus>(task?.status ?? "todo");
   const [memo, setMemo] = useState(task?.memo ?? "");
   const [link, setLink] = useState(task?.link ?? "");
   const [dueDate, setDueDate] = useState(task?.dueDate?.slice(0, 10) ?? "");
@@ -42,6 +59,7 @@ export function TaskEditDialog({
   if (task && task.id !== prevTaskId) {
     setPrevTaskId(task.id);
     setTitle(task.title);
+    setStatus(task.status);
     setMemo(task.memo ?? "");
     setLink(task.link ?? "");
     setDueDate(task.dueDate?.slice(0, 10) ?? "");
@@ -51,6 +69,7 @@ export function TaskEditDialog({
     if (!title.trim()) return;
     onSave({
       title: title.trim(),
+      status,
       memo: memo.trim() || null,
       link: link.trim() || null,
       dueDate: dueDate || null,
@@ -64,6 +83,27 @@ export function TaskEditDialog({
           <DialogTitle>タスク編集</DialogTitle>
         </DialogHeader>
         <div className="space-y-4">
+          {/* Status Selector */}
+          <div>
+            <label className="text-sm font-medium text-muted-foreground">
+              ステータス
+            </label>
+            <div className="flex gap-2 mt-1">
+              {(["todo", "in_progress", "done"] as TaskStatus[]).map((s) => (
+                <button
+                  key={s}
+                  onClick={() => setStatus(s)}
+                  className={`flex-1 py-2 text-xs font-medium rounded-md border transition-colors ${
+                    status === s
+                      ? statusStyles[s].active
+                      : statusStyles[s].inactive
+                  }`}
+                >
+                  {STATUS_LABELS[s]}
+                </button>
+              ))}
+            </div>
+          </div>
           <div>
             <label className="text-sm font-medium text-muted-foreground">
               タイトル

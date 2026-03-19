@@ -2,9 +2,22 @@
 
 import { useState, useEffect, useCallback } from "react";
 import { Plus, BookOpen } from "lucide-react";
+import {
+  DndContext,
+  closestCenter,
+  PointerSensor,
+  TouchSensor,
+  useSensor,
+  useSensors,
+  DragEndEvent,
+} from "@dnd-kit/core";
+import {
+  SortableContext,
+  verticalListSortingStrategy,
+  arrayMove,
+} from "@dnd-kit/sortable";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { Progress } from "@/components/ui/progress";
 import {
   Dialog,
   DialogContent,
@@ -13,7 +26,7 @@ import {
 } from "@/components/ui/dialog";
 import { CategorySection } from "@/components/category-section";
 import { TaskEditDialog } from "@/components/task-edit-dialog";
-import { Category, Task, STATUS_CYCLE } from "@/lib/types";
+import { Category, Task, TaskStatus, STATUS_CYCLE } from "@/lib/types";
 import * as api from "@/lib/api";
 
 export function WbsApp() {
@@ -34,13 +47,33 @@ export function WbsApp() {
     reload();
   }, [reload]);
 
-  // Overall progress
+  const sensors = useSensors(
+    useSensor(PointerSensor, { activationConstraint: { distance: 8 } }),
+    useSensor(TouchSensor, {
+      activationConstraint: { delay: 200, tolerance: 5 },
+    })
+  );
+
+  const handleDragEnd = async (event: DragEndEvent) => {
+    const { active, over } = event;
+    if (!over || active.id === over.id) return;
+    const oldIndex = categories.findIndex((c) => c.id === active.id);
+    const newIndex = categories.findIndex((c) => c.id === over.id);
+    const reordered = arrayMove(categories, oldIndex, newIndex);
+    setCategories(reordered);
+    await api.reorderCategories(reordered.map((c) => c.id));
+  };
+
+  const today = new Date().toLocaleDateString("ja-JP", {
+    year: "numeric",
+    month: "long",
+    day: "numeric",
+    weekday: "short",
+  });
+
   const allTasks = categories.flatMap((c) => c.tasks);
   const doneTotal = allTasks.filter((t) => t.status === "done").length;
-  const overallPercent =
-    allTasks.length > 0 ? (doneTotal / allTasks.length) * 100 : 0;
 
-  // Category CRUD
   const handleAddCategory = async () => {
     if (!categoryName.trim()) return;
     await api.createCategory(categoryName.trim(), categories.length);
@@ -64,7 +97,6 @@ export function WbsApp() {
     reload();
   };
 
-  // Task CRUD
   const handleAddTask = async (categoryId: number, title: string) => {
     const cat = categories.find((c) => c.id === categoryId);
     await api.createTask(categoryId, title, cat?.tasks.length ?? 0);
@@ -80,6 +112,7 @@ export function WbsApp() {
 
   const handleSaveTask = async (data: {
     title: string;
+    status: TaskStatus;
     memo: string | null;
     link: string | null;
     dueDate: string | null;
@@ -106,63 +139,68 @@ export function WbsApp() {
   }
 
   return (
-    <div className="max-w-lg mx-auto px-4 pb-24">
+    <div className="min-h-screen bg-stone-50">
       {/* Header */}
-      <header className="sticky top-0 z-10 bg-background/95 backdrop-blur py-4 border-b mb-4">
-        <div className="flex items-center justify-between">
-          <div className="flex items-center gap-2">
-            <BookOpen className="w-5 h-5" />
-            <h1 className="font-bold text-lg">読書事業WBS</h1>
+      <header className="sticky top-0 z-10 bg-white pt-[max(3.5rem,calc(env(safe-area-inset-top)+1rem))] pb-4 px-5 mb-2">
+        <div className="max-w-lg mx-auto">
+          <p className="text-xs text-stone-400 mb-1">{today}</p>
+          <div className="flex items-center justify-between">
+            <h1 className="font-bold text-xl tracking-tight">読書事業WBS</h1>
+            <button
+              onClick={() => {
+                setCategoryName("");
+                setShowCategoryDialog(true);
+              }}
+              className="flex items-center gap-1 text-sm font-medium text-stone-500 active:text-stone-800"
+            >
+              <Plus className="w-4 h-4" />
+              追加
+            </button>
           </div>
-          <Button
-            size="sm"
-            variant="outline"
-            onClick={() => {
-              setCategoryName("");
-              setShowCategoryDialog(true);
-            }}
-          >
-            <Plus className="w-4 h-4 mr-1" />
-            カテゴリ
-          </Button>
+          {allTasks.length > 0 && (
+            <p className="text-xs text-stone-400 mt-1">
+              {doneTotal}/{allTasks.length} 完了
+            </p>
+          )}
         </div>
-        {/* Overall Progress */}
-        {allTasks.length > 0 && (
-          <div className="mt-3">
-            <div className="flex justify-between text-xs text-muted-foreground mb-1">
-              <span>全体進捗</span>
-              <span>
-                {doneTotal}/{allTasks.length} ({Math.round(overallPercent)}%)
-              </span>
-            </div>
-            <Progress value={overallPercent} className="h-2" />
-          </div>
-        )}
       </header>
 
       {/* Categories */}
-      <div className="space-y-4">
-        {categories.length === 0 ? (
-          <div className="text-center py-12 text-muted-foreground">
-            <BookOpen className="w-12 h-12 mx-auto mb-3 opacity-50" />
-            <p>カテゴリを追加して始めましょう</p>
-          </div>
-        ) : (
-          categories.map((category) => (
-            <CategorySection
-              key={category.id}
-              category={category}
-              onAddTask={handleAddTask}
-              onToggleStatus={handleToggleStatus}
-              onEditTask={setEditingTask}
-              onEditCategory={(cat) => {
-                setEditingCategory(cat);
-                setCategoryName(cat.name);
-              }}
-              onDeleteCategory={handleDeleteCategory}
-            />
-          ))
-        )}
+      <div className="max-w-lg mx-auto px-4 pb-[max(6rem,calc(1.5rem+env(safe-area-inset-bottom)))]">
+        <div className="space-y-3">
+          {categories.length === 0 ? (
+            <div className="text-center py-16 text-stone-400">
+              <BookOpen className="w-10 h-10 mx-auto mb-3 opacity-40" />
+              <p className="text-sm">カテゴリを追加して始めましょう</p>
+            </div>
+          ) : (
+            <DndContext
+              sensors={sensors}
+              collisionDetection={closestCenter}
+              onDragEnd={handleDragEnd}
+            >
+              <SortableContext
+                items={categories.map((c) => c.id)}
+                strategy={verticalListSortingStrategy}
+              >
+                {categories.map((category) => (
+                  <CategorySection
+                    key={category.id}
+                    category={category}
+                    onAddTask={handleAddTask}
+                    onToggleStatus={handleToggleStatus}
+                    onEditTask={setEditingTask}
+                    onEditCategory={(cat) => {
+                      setEditingCategory(cat);
+                      setCategoryName(cat.name);
+                    }}
+                    onDeleteCategory={handleDeleteCategory}
+                  />
+                ))}
+              </SortableContext>
+            </DndContext>
+          )}
+        </div>
       </div>
 
       {/* Add Category Dialog */}

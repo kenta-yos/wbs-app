@@ -1,6 +1,6 @@
 import { db } from "@/db";
 import { categories } from "@/db/schema";
-import { eq } from "drizzle-orm";
+import { eq, asc, sql } from "drizzle-orm";
 import { NextRequest, NextResponse } from "next/server";
 
 export async function GET() {
@@ -8,7 +8,7 @@ export async function GET() {
     orderBy: (categories, { asc }) => [asc(categories.sortOrder)],
     with: {
       tasks: {
-        orderBy: (tasks, { asc }) => [asc(tasks.sortOrder)],
+        orderBy: (tasks) => [sql`${tasks.status} = 'done'`, sql`${tasks.dueDate} IS NULL`, asc(tasks.dueDate), asc(tasks.sortOrder)],
       },
     },
   });
