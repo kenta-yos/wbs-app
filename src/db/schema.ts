@@ -23,7 +23,7 @@ export const tasks = pgTable("tasks", {
     .default("todo"),
   memo: text("memo"),
   link: text("link"),
-  dueDate: timestamp("due_date"),
+  dueDate: text("due_date"),
   sortOrder: integer("sort_order").notNull().default(0),
   createdAt: timestamp("created_at").defaultNow().notNull(),
 });

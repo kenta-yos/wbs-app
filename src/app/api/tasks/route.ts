@@ -13,7 +13,7 @@ export async function POST(request: NextRequest) {
       status: body.status ?? "todo",
       memo: body.memo ?? null,
       link: body.link ?? null,
-      dueDate: body.dueDate ? new Date(body.dueDate) : null,
+      dueDate: body.dueDate || null,
       sortOrder: body.sortOrder ?? 0,
     })
     .returning();
@@ -28,7 +28,7 @@ export async function PATCH(request: NextRequest) {
   if (body.memo !== undefined) updates.memo = body.memo;
   if (body.link !== undefined) updates.link = body.link;
   if (body.dueDate !== undefined)
-    updates.dueDate = body.dueDate ? new Date(body.dueDate) : null;
+    updates.dueDate = body.dueDate || null;
 
   const result = await db
     .update(tasks)

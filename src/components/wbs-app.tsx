@@ -139,9 +139,9 @@ export function WbsApp() {
   }
 
   return (
-    <div className="min-h-screen bg-stone-50">
+    <div className="min-h-screen bg-stone-100">
       {/* Header */}
-      <header className="sticky top-0 z-10 bg-white pt-[max(3.5rem,calc(env(safe-area-inset-top)+1rem))] pb-4 px-5 mb-2">
+      <header className="sticky top-0 z-10 bg-stone-100 pt-[max(3.5rem,calc(env(safe-area-inset-top)+1rem))] pb-4 px-5 mb-2">
         <div className="max-w-lg mx-auto">
           <p className="text-xs text-stone-400 mb-1">{today}</p>
           <div className="flex items-center justify-between">

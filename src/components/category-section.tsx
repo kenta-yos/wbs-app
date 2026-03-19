@@ -105,7 +105,7 @@ export function CategorySection({
     <div
       ref={setNodeRef}
       style={style}
-      className={`bg-white rounded-xl ${allDone ? "opacity-50" : ""}`}
+      className={`bg-stone-50 rounded-xl ${allDone ? "opacity-50" : ""}`}
     >
       {/* Category Header */}
       <div className="flex items-center gap-1 px-2 py-3">
