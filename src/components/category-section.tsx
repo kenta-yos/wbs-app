@@ -297,8 +297,12 @@ export function CategorySection({
                 placeholder="タスク名を入力..."
                 className="text-sm h-9"
                 autoFocus
+                enterKeyHint="done"
                 onKeyDown={(e) => {
-                  if (e.key === "Enter") handleAddTask();
+                  if (e.key === "Enter" && !e.nativeEvent.isComposing) {
+                    e.preventDefault();
+                    handleAddTask();
+                  }
                   if (e.key === "Escape") {
                     setShowAddTask(false);
                     setNewTaskTitle("");
